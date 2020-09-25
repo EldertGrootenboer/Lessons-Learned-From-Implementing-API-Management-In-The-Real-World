@@ -125,7 +125,7 @@
             "apiVersion": "2019-12-01",
             "name": "[concat(parameters('apiManagement').name, '/', toLower(parameters('apiManagement').users.janeDoe.company))]",
             "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/users', parameters('apiManagement').name)]"
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagement').name)]"
             ],
             "properties": {
                 "state": "published",
@@ -155,7 +155,7 @@
             "apiVersion": "2019-12-01",
             "name": "[concat(parameters('apiManagement').name, '/mySecret')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/users', parameters('apiManagement').name)]"
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagement').name)]"
             ],
             "properties": {
                 "secret": true,
