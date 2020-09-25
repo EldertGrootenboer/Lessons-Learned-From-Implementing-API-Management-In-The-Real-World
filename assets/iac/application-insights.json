@@ -4,7 +4,7 @@
     "parameters": {
         "applicationInsights": {
             "defaultValue": {
-                "name": "appi-lessons-learned-apim-"
+                "name": "[concat('appi-lessons-learned-apim-', uniqueString(resourceGroup().name))]"
             },
             "type": "object"
         },

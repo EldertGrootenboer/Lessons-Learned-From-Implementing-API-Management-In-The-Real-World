@@ -22,7 +22,7 @@
         },
         "applicationInsights": {
             "defaultValue": {
-                "name": "appi-lessons-learned-apim-"
+                "name": "[concat('appi-lessons-learned-apim-', uniqueString(resourceGroup().name))]"
             },
             "type": "object"
         },
@@ -124,9 +124,12 @@
             "type": "Microsoft.ApiManagement/service/products",
             "apiVersion": "2019-12-01",
             "name": "[concat(parameters('apiManagement').name, '/', toLower(parameters('apiManagement').users.janeDoe.company))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/users', parameters('apiManagement').name)]"
+            ],
             "properties": {
                 "state": "published",
-                "displayName": "parameters('apiManagement').users.janeDoe.company"
+                "displayName": "[parameters('apiManagement').users.janeDoe.company]"
             }
         },
         {
@@ -151,6 +154,9 @@
             "type": "Microsoft.ApiManagement/service/namedValues",
             "apiVersion": "2019-12-01",
             "name": "[concat(parameters('apiManagement').name, '/mySecret')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/users', parameters('apiManagement').name)]"
+            ],
             "properties": {
                 "secret": true,
                 "displayName": "MyAwesomeSecret",
