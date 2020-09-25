@@ -7,6 +7,9 @@
                 "baseUri": "https://raw.githubusercontent.com/EldertGrootenboer/Lessons-Learned-From-Implementing-API-Management-In-The-Real-World/master/assets/iac/"
             },
             "type": "object"
+        },
+        "usersPassword": {
+            "type": "securestring"
         }
     },
     "resources": [
@@ -34,6 +37,11 @@
                 "templateLink": {
                     "uri": "[uri(parameters('gitHub').baseUri, 'api-management.json')]",
                     "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "usersPassword": {
+                        "value": "[parameters('usersPassword')]"
+                    }
                 }
             }
         }

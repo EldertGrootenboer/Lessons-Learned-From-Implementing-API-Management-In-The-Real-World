@@ -10,11 +10,11 @@
                 "sku": "Developer",
                 "users": {
                     "janeDoe": {
-                        "name": "janeDoe",
+                        "company": "Fabrikam",
+                        "email": "jane.doe@outlook.com",
                         "firstName": "Jane",
                         "lastName": "Doe",
-                        "email": "jane.doe@outlook.com",
-                        "company": "Fabrikam"
+                        "name": "janeDoe"
                     }
                 }
             },
