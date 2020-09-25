@@ -118,14 +118,7 @@
             ],
             "properties": {
                 "displayName": "[parameters('apiManagement').users.janeDoe.company]"
-            },
-            "resources": [
-                {
-                    "type": "Microsoft.ApiManagement/service/groups/users",
-                    "apiVersion": "2019-12-01",
-                    "name": "[concat(parameters('apiManagement').name, '/', toLower(parameters('apiManagement').users.janeDoe.company), '/', toLower(parameters('apiManagement').users.janeDoe.name))]"
-                }
-            ]
+            }
         },
         {
             "type": "Microsoft.ApiManagement/service/products",
@@ -134,13 +127,24 @@
             "properties": {
                 "state": "published",
                 "displayName": "parameters('apiManagement').users.janeDoe.company"
-            },
-            "resources": [
-                {
-                    "type": "Microsoft.ApiManagement/service/products/groups",
-                    "apiVersion": "2019-12-01",
-                    "name": "[concat(parameters('apiManagement').name, '/', toLower(parameters('apiManagement').users.janeDoe.company), '/', toLower(parameters('apiManagement').users.janeDoe.company))]"
-                }
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/groups/users",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('apiManagement').name, '/', toLower(parameters('apiManagement').users.janeDoe.company), '/', toLower(parameters('apiManagement').users.janeDoe.name))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('apiManagement').name, toLower(parameters('apiManagement').users.janeDoe.company))]",
+                "[resourceId('Microsoft.ApiManagement/service/users', parameters('apiManagement').name, parameters('apiManagement').users.janeDoe.name)]"
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/groups",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('apiManagement').name, '/', toLower(parameters('apiManagement').users.janeDoe.company), '/', toLower(parameters('apiManagement').users.janeDoe.company))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('apiManagement').name, toLower(parameters('apiManagement').users.janeDoe.company))]",
+                "[resourceId('Microsoft.ApiManagement/service/groups', parameters('apiManagement').name, toLower(parameters('apiManagement').users.janeDoe.company))]"
             ]
         },
         {
