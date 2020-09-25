@@ -1,0 +1,157 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "apiManagement": {
+            "defaultValue": {
+                "name": "[concat('apim-lessons-learned-apim-', uniqueString(resourceGroup().name))]",
+                "publisherEmail": "eldert@eldert.net",
+                "publisherName": "EPH",
+                "sku": "Developer",
+                "users": {
+                    "janeDoe": {
+                        "name": "janeDoe",
+                        "firstName": "Jane",
+                        "lastName": "Doe",
+                        "email": "jane.doe@outlook.com",
+                        "company": "Fabrikam"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "applicationInsights": {
+            "defaultValue": {
+                "name": "appi-lessons-learned-apim-"
+            },
+            "type": "object"
+        },
+        "general": {
+            "defaultValue": {
+                "location": "[resourceGroup().location]",
+                "tags": {
+                    "LastModifiedDate": "[utcNow()]",
+                    "Project": "Azure Resource Manager In A Serverless World",
+                    "Purpose": "Session"
+                }
+            },
+            "type": "object"
+        },
+        "usersPassword": {
+            "type": "securestring"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service",
+            "apiVersion": "2019-12-01",
+            "name": "[parameters('apiManagement').name]",
+            "location": "[parameters('general').location]",
+            "tags": "[parameters('general').tags]",
+            "sku": {
+                "name": "[parameters('apiManagement').sku]",
+                "capacity": 1
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "publisherEmail": "[parameters('apiManagement').publisherEmail]",
+                "publisherName": "[parameters('apiManagement').publisherName]"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/loggers",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('apiManagement').name, '/', parameters('applicationInsights').name)]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagement').name)]"
+            ],
+            "properties": {
+                "loggerType": "applicationInsights",
+                "credentials": {
+                    "instrumentationKey": "[reference(resourceId('Microsoft.Insights/components', parameters('applicationInsights').name), '2014-04-01').InstrumentationKey]"
+                },
+                "isBuffered": true,
+                "resourceId": "[resourceId('Microsoft.Insights/components', parameters('applicationInsights').name)]"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/diagnostics",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('apiManagement').name, '/applicationinsights')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('apiManagement').name, parameters('applicationInsights').name)]"
+            ],
+            "properties": {
+                "alwaysLog": "allErrors",
+                "httpCorrelationProtocol": "Legacy",
+                "logClientIp": true,
+                "loggerId": "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('apiManagement').name, parameters('applicationInsights').name)]",
+                "sampling": {
+                    "samplingType": "fixed",
+                    "percentage": 100
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/users",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('apiManagement').name, '/', parameters('apiManagement').users.janeDoe.name)]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagement').name)]"
+            ],
+            "properties": {
+                "email": "[parameters('apiManagement').users.janeDoe.email]",
+                "firstName": "[parameters('apiManagement').users.janeDoe.firstName]",
+                "lastName": "[parameters('apiManagement').users.janeDoe.lastName]",
+                "password": "[parameters('usersPassword')]",
+                "appType": "developerPortal"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/groups",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('apiManagement').name, '/', toLower(parameters('apiManagement').users.janeDoe.company))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/users', parameters('apiManagement').name, parameters('apiManagement').users.janeDoe.name)]"
+            ],
+            "properties": {
+                "displayName": "[parameters('apiManagement').users.janeDoe.company]"
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.ApiManagement/service/groups/users",
+                    "apiVersion": "2019-12-01",
+                    "name": "[resourceId('Microsoft.ApiManagement/service/users', parameters('apiManagement').name, parameters('apiManagement').users.janeDoe.name)]"
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('apiManagement').name, '/', toLower(parameters('apiManagement').users.janeDoe.company))]",
+            "properties": {
+                "state": "published",
+                "displayName": "parameters('apiManagement').users.janeDoe.company"
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.ApiManagement/service/products/groups",
+                    "apiVersion": "2019-12-01",
+                    "name": "[resourceId('Microsoft.ApiManagement/service/groups', parameters('apiManagement').name, toLower(parameters('apiManagement').users.janeDoe.company))]"
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/namedValues",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('apiManagement').name, '/mySecret')]",
+            "properties": {
+                "secret": true,
+                "displayName": "MyAwesomeSecret",
+                "value": "1VeryImportantPassword!"
+            }
+        }
+    ]
+}
