@@ -5,7 +5,7 @@
 # Update these according to the environment
 $subscriptionName = "Visual Studio Enterprise"
 $resourceGroupName = "rg-lessons-learned-from-implementing-api-management"
-$basePath = "C:\Users\elder\OneDrive\Sessions\Azure-Resource-Manager-in-A-Serverless-World"
+$basePath = "C:\Users\elder\OneDrive\Sessions\Lessons-Learned-From-Implementing-API-Management-In-The-Real-World"
 
 # Login to Azure
 Get-AzSubscription -SubscriptionName $subscriptionName | Set-AzContext
