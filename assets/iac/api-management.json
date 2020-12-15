@@ -189,7 +189,7 @@
                 },
                 "secret": true
             }
-        }
+        },
         {
             "type": "Microsoft.KeyVault/vaults/accessPolicies",
             "apiVersion": "2016-10-01",
