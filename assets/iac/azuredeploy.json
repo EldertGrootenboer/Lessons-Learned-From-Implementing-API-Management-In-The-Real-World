@@ -2,6 +2,9 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "administratorObjectId": {
+            "type": "string"
+        },
         "gitHub": {
             "defaultValue": {
                 "baseUri": "https://raw.githubusercontent.com/EldertGrootenboer/Lessons-Learned-From-Implementing-API-Management-In-The-Real-World/master/assets/iac/"
@@ -28,9 +31,30 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
+            "name": "keyVault",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(parameters('gitHub').baseUri, 'key-vault.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "administratorObjectId": {
+                        "value": "[parameters('administratorObjectId')]"
+                    },
+                    "usersPassword": {
+                        "value": "[parameters('usersPassword')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
             "name": "apiManagement",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'applicationInsights')]"
+                "[resourceId('Microsoft.Resources/deployments', 'applicationInsights')]",
+                "[resourceId('Microsoft.Resources/deployments', 'keyVault')]"
             ],
             "properties": {
                 "mode": "Incremental",

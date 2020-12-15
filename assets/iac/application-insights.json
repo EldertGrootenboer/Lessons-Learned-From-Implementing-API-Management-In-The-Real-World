@@ -13,7 +13,7 @@
                 "location": "[resourceGroup().location]",
                 "tags": {
                     "LastModifiedDate": "[utcNow()]",
-                    "Project": "Azure Resource Manager In A Serverless World",
+                    "Project": "Lessons Learned From Implementing API Management In The Real World",
                     "Purpose": "Session"
                 }
             },

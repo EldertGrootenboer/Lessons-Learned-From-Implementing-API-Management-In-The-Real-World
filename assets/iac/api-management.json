@@ -31,8 +31,17 @@
                 "location": "[resourceGroup().location]",
                 "tags": {
                     "LastModifiedDate": "[utcNow()]",
-                    "Project": "Azure Resource Manager In A Serverless World",
+                    "Project": "Lessons Learned From Implementing API Management In The Real World",
                     "Purpose": "Session"
+                }
+            },
+            "type": "object"
+        },
+        "keyVault": {
+            "defaultValue": {
+                "name": "[concat('kv-', uniqueString(resourceGroup().name))]",
+                "secrets": {
+                    "basicAuthenticationPassword": "BasicAuthenticationPassword"
                 }
             },
             "type": "object"
@@ -161,8 +170,46 @@
             ],
             "properties": {
                 "secret": true,
-                "displayName": "MyAwesomeSecret",
+                "displayName": "My Secret",
                 "value": "1VeryImportantPassword!"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/namedValues",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiManagement').name, '/mySecureSecret')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagement').name)]",
+                "[resourceId('Microsoft.KeyVault/vaults/accessPolicies', parameters('keyVault').name, '/add')]"
+            ],
+            "properties": {
+                "displayName": "My Secure Secret",
+                "keyVault": {
+                    "secretIdentifier": "[concat('https://', parameters('keyVault').name, '.vault.azure.net/secrets/', parameters('keyVault').secrets.basicAuthenticationPassword)]"
+                },
+                "secret": true
+            }
+        }
+        {
+            "type": "Microsoft.KeyVault/vaults/accessPolicies",
+            "apiVersion": "2016-10-01",
+            "name": "[concat(parameters('keyVault').name, '/add')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagement').name)]"
+            ],
+            "properties": {
+                "accessPolicies": [
+                    {
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "[reference(resourceId('Microsoft.ApiManagement/service', parameters('apiManagement').name), '2019-12-01', 'Full').identity.principalId]",
+                        "permissions": {
+                            "secrets": [
+                                "Get",
+                                "List"
+                            ]
+                        }
+                    }
+                ]
             }
         }
     ]
