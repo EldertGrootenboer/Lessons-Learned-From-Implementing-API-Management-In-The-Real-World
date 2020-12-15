@@ -41,7 +41,7 @@
             "defaultValue": {
                 "name": "[concat('kv-', uniqueString(resourceGroup().name))]",
                 "secrets": {
-                    "basicAuthenticationPassword": "BasicAuthenticationPassword"
+                    "usersPassword": "usersPassword"
                 }
             },
             "type": "object"
@@ -185,7 +185,7 @@
             "properties": {
                 "displayName": "My Secure Secret",
                 "keyVault": {
-                    "secretIdentifier": "[concat('https://', parameters('keyVault').name, '.vault.azure.net/secrets/', parameters('keyVault').secrets.basicAuthenticationPassword)]"
+                    "secretIdentifier": "[concat('https://', parameters('keyVault').name, '.vault.azure.net/secrets/', parameters('keyVault').secrets.usersPassword)]"
                 },
                 "secret": true
             }

@@ -106,7 +106,7 @@
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
             "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('keyVault').name, '/', parameters('keyVault').secrets.basicAuthenticationPassword)]",
+            "name": "[concat(parameters('keyVault').name, '/', parameters('keyVault').secrets.usersPassword)]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVault').name)]"
             ],
